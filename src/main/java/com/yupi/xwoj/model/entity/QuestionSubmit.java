@@ -7,8 +7,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 题目提交
@@ -17,12 +19,14 @@ import lombok.Data;
  */
 @TableName(value = "question_submit")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class QuestionSubmit {
     /**
      * id
      */
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
 
     /**

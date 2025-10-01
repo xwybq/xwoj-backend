@@ -1,13 +1,20 @@
 package com.yupi.xwoj.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.yupi.xwoj.annotation.AuthCheck;
 import com.yupi.xwoj.common.BaseResponse;
 import com.yupi.xwoj.common.ErrorCode;
 import com.yupi.xwoj.common.ResultUtils;
+import com.yupi.xwoj.constant.UserConstant;
 import com.yupi.xwoj.exception.BusinessException;
 
+import com.yupi.xwoj.model.dto.question.QuestionQueryRequest;
 import com.yupi.xwoj.model.dto.questionsubmit.QuestionSubmitAddRequest;
+import com.yupi.xwoj.model.dto.questionsubmit.QuestionSubmitQueryRequest;
+import com.yupi.xwoj.model.entity.Question;
 import com.yupi.xwoj.model.entity.QuestionSubmit;
 import com.yupi.xwoj.model.entity.User;
+import com.yupi.xwoj.model.vo.QuestionSubmitVO;
 import com.yupi.xwoj.service.QuestionSubmitService;
 import com.yupi.xwoj.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +61,27 @@ public class QuestionSubmitController {
         final User loginUser = userService.getLoginUser(request);
         long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, loginUser);
         return ResultUtils.success(questionSubmitId);
+    }
+
+
+    /**
+     * 分页获取题目提交列表（除了管理员外，普通用户只能看到非管理员的题目提交）
+     *
+     * @param questionSubmitQueryRequest
+     * @return
+     */
+    @PostMapping("/list/page")
+//    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+
+    public BaseResponse<Page<QuestionSubmitVO>> listQuestionSubmitByPage(@RequestBody QuestionSubmitQueryRequest questionSubmitQueryRequest
+            , HttpServletRequest request) {
+        long current = questionSubmitQueryRequest.getCurrent();
+        long size = questionSubmitQueryRequest.getPageSize();
+        //得到了原始数据
+        Page<QuestionSubmit> questionSubmitPage = questionSubmitService.page(new Page<>(current, size),
+                questionSubmitService.getQueryWrapper(questionSubmitQueryRequest));
+        final User loginUser = userService.getLoginUser(request);
+        return ResultUtils.success(questionSubmitService.getQuestionSubmitVOPage(questionSubmitPage, loginUser));
     }
 
 }

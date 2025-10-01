@@ -17,11 +17,7 @@ import java.util.List;
  */
 @Data
 public class QuestionAddRequest implements Serializable {
-    /**
-     * id
-     */
-    @TableId(type = IdType.AUTO)
-    private Long id;
+
 
     /**
      * 标题
