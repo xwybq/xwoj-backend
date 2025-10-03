@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yupi.xwoj.common.ErrorCode;
 import com.yupi.xwoj.constant.CommonConstant;
 import com.yupi.xwoj.exception.BusinessException;
+import com.yupi.xwoj.judge.JudgeService;
 import com.yupi.xwoj.model.dto.question.QuestionQueryRequest;
 import com.yupi.xwoj.model.dto.questionsubmit.QuestionSubmitAddRequest;
 import com.yupi.xwoj.model.dto.questionsubmit.QuestionSubmitQueryRequest;
@@ -20,10 +21,12 @@ import com.yupi.xwoj.model.vo.UserVO;
 import com.yupi.xwoj.service.*;
 import com.yupi.xwoj.mapper.QuestionSubmitMapper;
 import com.yupi.xwoj.utils.SqlUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +35,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -40,11 +46,16 @@ import java.util.stream.Collectors;
  * @createDate 2025-10-01 15:44:11
  */
 @Service
+@Slf4j
 public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper, QuestionSubmit> implements QuestionSubmitService {
     @Resource
     private QuestionService questionService;
-    @Autowired
+    @Resource
     private UserService userService;
+
+    @Resource
+    @Lazy
+    private JudgeService judgeService;
 
     /**
      * 题目提交
@@ -67,15 +78,8 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         if (question == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
-        // 是否已点赞
+
         long userId = loginUser.getId();
-        /*// 每个用户串行点赞
-        // 锁必须要包裹住事务方法，否则会失效
-        QuestionSubmitService questionSubmitService = (QuestionSubmitService) AopContext.currentProxy();
-        // 锁的粒度是 userId，防止并发问题
-        synchronized (String.valueOf(userId).intern()) {
-            return questionSubmitService.doQuestionSubmitInner(userId, questionId);
-        }*/
         QuestionSubmit questionSubmit = QuestionSubmit.builder().userId(userId).questionId(questionId).language(language).code(questionSubmitAddRequest.getCode())
                 //初始状态为待判题
                 .status(QuestionSubmitStatusEnum.WAITING.getValue()).judgeInfo("{}").build();
@@ -83,7 +87,27 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         if (!success) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "数据插入失败");
         }
-        return questionSubmit.getId();
+        Long questionSubmitId = questionSubmit.getId();
+
+        log.info("questionSubmit保存成功，准备提交异步判题任务，questionSubmitId: {}", questionSubmitId);
+
+// 2. 异步任务用自定义线程池执行
+        CompletableFuture.runAsync(() -> {
+            try {
+                judgeService.doJudge(questionSubmitId);
+            } catch (Exception e) {
+                log.error("异步判题任务执行失败，questionSubmitId: {}", questionSubmitId, e);
+            }
+        }); // 传入自定义线程池
+        // 提交成功后，执行判题服务（只打印日志，不调用judgeService）
+        // 替换 CompletableFuture，用原生Thread测试
+    /*    new Thread(() -> {
+            log.error("=== 原生Thread启动！questionSubmitId: {} ===", questionSubmitId);
+        }, "TestJudgeThread-" + questionSubmitId).start();*/
+//        judgeService.doJudge(questionSubmitId);
+        log.info("异步判题任务已提交（不管是否执行），questionSubmitId: {}", questionSubmitId);
+
+        return questionSubmitId;
     }
 
     /**

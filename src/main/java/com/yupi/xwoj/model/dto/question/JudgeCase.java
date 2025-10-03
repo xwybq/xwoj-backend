@@ -8,10 +8,6 @@ import lombok.Data;
 @Data
 public class JudgeCase {
 
-    {
-
-    }
-
     /**
      * 输入用例，例如 "1 2"
      */

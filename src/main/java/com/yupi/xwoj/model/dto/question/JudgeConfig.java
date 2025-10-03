@@ -1,11 +1,17 @@
 package com.yupi.xwoj.model.dto.question;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 判题配置
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class JudgeConfig {
 
 
