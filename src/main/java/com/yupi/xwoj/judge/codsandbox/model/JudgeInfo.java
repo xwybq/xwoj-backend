@@ -1,4 +1,4 @@
-package com.yupi.xwoj.model.dto.questionsubmit;
+package com.yupi.xwoj.judge.codsandbox.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,8 +14,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class JudgeInfo {
-
-
     /**
      * 程序执行信息
      */

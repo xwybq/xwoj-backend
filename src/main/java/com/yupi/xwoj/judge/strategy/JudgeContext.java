@@ -1,8 +1,7 @@
 package com.yupi.xwoj.judge.strategy;
 
-import co.elastic.clients.elasticsearch.watcher.Input;
 import com.yupi.xwoj.model.dto.question.JudgeCase;
-import com.yupi.xwoj.model.dto.questionsubmit.JudgeInfo;
+import com.yupi.xwoj.judge.codsandbox.model.JudgeInfo;
 import com.yupi.xwoj.model.entity.Question;
 import com.yupi.xwoj.model.entity.QuestionSubmit;
 import lombok.AllArgsConstructor;

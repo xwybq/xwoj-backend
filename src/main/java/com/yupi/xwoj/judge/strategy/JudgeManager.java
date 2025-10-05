@@ -1,7 +1,6 @@
 package com.yupi.xwoj.judge.strategy;
 
-import com.yupi.xwoj.model.dto.questionsubmit.JudgeInfo;
-import com.yupi.xwoj.model.entity.Question;
+import com.yupi.xwoj.judge.codsandbox.model.JudgeInfo;
 import com.yupi.xwoj.model.entity.QuestionSubmit;
 import org.springframework.stereotype.Service;
 

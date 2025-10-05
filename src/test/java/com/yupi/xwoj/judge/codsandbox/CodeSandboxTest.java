@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class CodeSandboxTest {
 
-
     @Value("${codesandbox.type:example}")
     private String type;
 
@@ -27,8 +26,15 @@ class CodeSandboxTest {
 
         CodeSandbox codeSandbox = CodeSandboxFactory.newInstance(type);
         ExecuteCodeRequest executeCodeRequest = ExecuteCodeRequest.builder()
-                .code("int main() { return 0; }")
-                .language(QuestionSubmitLanguageEnum.CPLUSPLUS.getValue())
+                .code("public class Main {\n" +
+                        "\n" +
+                        "    public static void main(String[] args) {\n" +
+                        "        int a = Integer.parseInt(args[0]);\n" +
+                        "        int b = Integer.parseInt(args[1]);\n" +
+                        "        System.out.println(\"结果：\" + (a + b));\n" +
+                        "    }\n" +
+                        "}\n")
+                .language(QuestionSubmitLanguageEnum.JAVA.getValue())
                 .inputList(List.of("1 2", "3 4"))
                 .build();
         ExecuteCodeResponse executeCodeResponse = codeSandbox.executeCode(executeCodeRequest);
@@ -54,12 +60,19 @@ class CodeSandboxTest {
         CodeSandbox codeSandbox = CodeSandboxFactory.newInstance(type);
         codeSandbox = new CodeSandboxPoxy(codeSandbox);
         ExecuteCodeRequest executeCodeRequest = ExecuteCodeRequest.builder()
-                .code("int main() { return 0; }")
-                .language(QuestionSubmitLanguageEnum.CPLUSPLUS.getValue())
+                .code("public class Main {\n" +
+                        "\n" +
+                        "    public static void main(String[] args) {\n" +
+                        "        int a = Integer.parseInt(args[0]);\n" +
+                        "        int b = Integer.parseInt(args[1]);\n" +
+                        "        System.out.println(\"结果：\" + (a + b));\n" +
+                        "    }\n" +
+                        "}\n")
+                .language(QuestionSubmitLanguageEnum.JAVA.getValue())
                 .inputList(List.of("1 2", "3 4"))
                 .build();
         ExecuteCodeResponse executeCodeResponse = codeSandbox.executeCode(executeCodeRequest);
-//            Assertions.assertNotNull(executeCodeResponse);
+        Assertions.assertNotNull(executeCodeResponse);
     }
 
 }
