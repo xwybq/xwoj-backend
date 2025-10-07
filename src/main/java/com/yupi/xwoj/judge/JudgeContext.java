@@ -1,4 +1,4 @@
-package com.yupi.xwoj.judge.strategy;
+package com.yupi.xwoj.judge;
 
 import com.yupi.xwoj.model.dto.question.JudgeCase;
 import com.yupi.xwoj.judge.codsandbox.model.JudgeInfo;

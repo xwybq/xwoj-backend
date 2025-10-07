@@ -6,7 +6,7 @@ spring:
     restart:
       enabled: false
   main:
-    allow-circular-references: true  # 允许循环依赖
+    allow-circular-references: false  # 允许循环依赖
   application:
     name: xwoj-backend
   # 默认 dev 环境
@@ -19,7 +19,7 @@ spring:
   # session 配置
   session:
     # todo 取消注释开启分布式 session（须先配置 Redis）
-    # store-type: redis
+    store-type: redis
     # 30 天过期
     timeout: 2592000
   # 数据库配置
@@ -29,14 +29,14 @@ spring:
     url: jdbc:mysql://localhost:3306/xwoj?serverTimezone=Asia/Shanghai
     username: root
     password: 123456
-  # Redis 配置
-  # todo 需替换配置，然后取消注释
-  #  redis:
-  #    database: 1
-  #    host: localhost
-  #    port: 6379
-  #    timeout: 5000
-  #    password: 123456
+#   Redis 配置
+#   todo 需替换配置，然后取消注释
+  redis:
+    database: 1
+    host: localhost
+    port: 6379
+    timeout: 5000
+    password: 123456
   # Elasticsearch 配置
   # todo 需替换配置，然后取消注释
   #  elasticsearch:

@@ -11,11 +11,16 @@ import com.yupi.xwoj.constant.UserConstant;
 import com.yupi.xwoj.exception.BusinessException;
 import com.yupi.xwoj.exception.ThrowUtils;
 import com.yupi.xwoj.model.dto.question.*;
+import com.yupi.xwoj.model.dto.questionsubmit.QuestionSubmitAddRequest;
+import com.yupi.xwoj.model.dto.questionsubmit.QuestionSubmitQueryRequest;
 import com.yupi.xwoj.model.dto.user.UserQueryRequest;
 import com.yupi.xwoj.model.entity.Question;
+import com.yupi.xwoj.model.entity.QuestionSubmit;
 import com.yupi.xwoj.model.entity.User;
+import com.yupi.xwoj.model.vo.QuestionSubmitVO;
 import com.yupi.xwoj.model.vo.QuestionVO;
 import com.yupi.xwoj.service.QuestionService;
+import com.yupi.xwoj.service.QuestionSubmitService;
 import com.yupi.xwoj.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -41,6 +46,9 @@ public class QuestionController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private QuestionSubmitService questionSubmitService;
 
     // region 增删改查
 
@@ -278,6 +286,48 @@ public class QuestionController {
         }
         boolean result = questionService.updateById(question);
         return ResultUtils.success(result);
+    }
+
+
+    /**
+     *
+     * 提交题目
+     *
+     * @param questionSubmitAddRequest
+     * @param request
+     * @return questionSubmitId 题目提交id
+     */
+    @PostMapping("/question_submit/do")
+    public BaseResponse<Long> doQuestionSubmit(@RequestBody QuestionSubmitAddRequest questionSubmitAddRequest,
+                                               HttpServletRequest request) {
+        if (questionSubmitAddRequest == null || questionSubmitAddRequest.getQuestionId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 登录才能点赞
+        final User loginUser = userService.getLoginUser(request);
+        long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, loginUser);
+        return ResultUtils.success(questionSubmitId);
+    }
+
+
+    /**
+     * 分页获取题目提交列表（除了管理员外，普通用户只能看到非管理员的题目提交）
+     *
+     * @param questionSubmitQueryRequest
+     * @return
+     */
+    @PostMapping("/question_submit/list/page")
+//    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+
+    public BaseResponse<Page<QuestionSubmitVO>> listQuestionSubmitByPage(@RequestBody QuestionSubmitQueryRequest questionSubmitQueryRequest
+            , HttpServletRequest request) {
+        long current = questionSubmitQueryRequest.getCurrent();
+        long size = questionSubmitQueryRequest.getPageSize();
+        //得到了原始数据
+        Page<QuestionSubmit> questionSubmitPage = questionSubmitService.page(new Page<>(current, size),
+                questionSubmitService.getQueryWrapper(questionSubmitQueryRequest));
+        final User loginUser = userService.getLoginUser(request);
+        return ResultUtils.success(questionSubmitService.getQuestionSubmitVOPage(questionSubmitPage, loginUser));
     }
 
 }

@@ -1,6 +1,9 @@
-package com.yupi.xwoj.judge.strategy;
+package com.yupi.xwoj.judge;
 
 import com.yupi.xwoj.judge.codsandbox.model.JudgeInfo;
+import com.yupi.xwoj.judge.strategy.DefaultJudgeStrategy;
+import com.yupi.xwoj.judge.strategy.JavaLanguageJudgeStrategy;
+import com.yupi.xwoj.judge.strategy.JudgeStrategy;
 import com.yupi.xwoj.model.entity.QuestionSubmit;
 import org.springframework.stereotype.Service;
 

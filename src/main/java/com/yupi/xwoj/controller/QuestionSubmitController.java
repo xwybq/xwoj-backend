@@ -33,8 +33,9 @@ import javax.servlet.http.HttpServletRequest;
  * @from <a href="https://yupi.icu">编程导航知识星球</a>
  */
 @RestController
-@RequestMapping("/question_submit")
+//@RequestMapping("/question_submit")
 @Slf4j
+@Deprecated
 public class QuestionSubmitController {
 
     @Resource
@@ -50,7 +51,7 @@ public class QuestionSubmitController {
      * @param questionSubmitAddRequest
      * @param request
      * @return resultNum 本次点赞变化数
-     */
+     *//*
     @PostMapping("/")
     public BaseResponse<Long> doQuestionSubmit(@RequestBody QuestionSubmitAddRequest questionSubmitAddRequest,
                                                HttpServletRequest request) {
@@ -64,12 +65,12 @@ public class QuestionSubmitController {
     }
 
 
-    /**
+    *//**
      * 分页获取题目提交列表（除了管理员外，普通用户只能看到非管理员的题目提交）
      *
      * @param questionSubmitQueryRequest
      * @return
-     */
+     *//*
     @PostMapping("/list/page")
 //    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
 
@@ -83,5 +84,5 @@ public class QuestionSubmitController {
         final User loginUser = userService.getLoginUser(request);
         return ResultUtils.success(questionSubmitService.getQuestionSubmitVOPage(questionSubmitPage, loginUser));
     }
-
+*/
 }
